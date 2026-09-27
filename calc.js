@@ -10,7 +10,7 @@
 // - 国税庁「令和８年度税制改正による所得税の基礎控除の引上げ等について」（源泉所得税の改正のあらまし、令和8年4月）
 //   https://www.nta.go.jp/users/gensen/2026kiso/index.htm
 //   ここから: 給与所得控除の最低保障額は令和8・9年分 74万円（収入220万円以下）、
-//   所得税の基礎控除は合計所得金額に応じて 104/62/67/62 万円（下の表）と確認した。
+//   所得税の基礎控除は合計所得金額に応じて 104/67/62 万円（下の表。2,350万円超は改正なし）と確認した。
 (function (root) {
   const MANEN = 10000;   // 1万円 = この円
 
@@ -28,14 +28,14 @@
 
   // 所得税の基礎控除（合計所得金額 = 給与所得のみの前提 万円 → 控除額 万円。令和8・9年分）
   const INCOME_TAX_BASIC_DEDUCTION_BRACKETS = [
-    { max: 336, amount: 104 },
-    { max: 489, amount: 62 },
+    { max: 489, amount: 104 },   // 132万以下・132〜336・336〜489万をまとめて104万円
     { max: 655, amount: 67 },
     { max: 2350, amount: 62 },
-    // ponytail: 2,350万円超の高所得者向けの逓減表（現行法で2,400万・2,450万・2,500万円が節目）は
-    // 一次情報で確かめられなかった。年収およそ2,545万円超のごく一部にしか関わらないため、
-    // 2,350万円以下と同じ62万円のまま据え置く簡略化にした。確かめたら上に段を足す。
-    { max: Infinity, amount: 62 },
+    // 2,350万円超は今回の改正の対象外（従来どおりの逓減表）
+    { max: 2400, amount: 48 },
+    { max: 2450, amount: 32 },
+    { max: 2500, amount: 16 },
+    { max: Infinity, amount: 0 },
   ];
   function incomeTaxBasicDeductionMan(salaryIncomeMan) {
     for (const b of INCOME_TAX_BASIC_DEDUCTION_BRACKETS) if (salaryIncomeMan <= b.max) return b.amount;
@@ -112,9 +112,8 @@
 
   // ---- 楽天ふるさと納税の検索結果へのリンク（「11.」）----
 
-  // 楽天アフィリエイトの ID。まだ発行していないので仮の値。
-  // オーナーが楽天アフィリエイトの管理画面で作ったら、ここを差し替える（README の「## データ」参照）。
-  const AFFILIATE_ID = 'TODO';
+  // 楽天アフィリエイトの ID。オーナーが楽天アフィリエイトの管理画面で作った値（README の「## データ」参照）。
+  const AFFILIATE_ID = '57f7e139.6fdf465c.57f7e13a.83a71d1b';
 
   const GENRE_KEYWORDS = {
     all: 'ふるさと納税',

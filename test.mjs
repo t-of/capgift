@@ -11,13 +11,9 @@ const test = (name, fn) => { fn(); console.log('✓', name); };
 const person = (income, extra = {}) => ({ income, spouse: false, hs: 0, uni: 0, social: null, donated: 0, ...extra });
 
 // 仕様「8.」の自己チェック用の値（社会保険料15%で見積もり）。
-// 500万・独身の行は、所得税の基礎控除が336万円超489万円以下で62万円になる（104万円ではない。
-// 国税庁「令和8年度税制改正による所得税の基礎控除の引上げ等について」で確認）ため、
-// 仕様の草稿（所得税率5%・上限57,000円）から、所得税率10%・上限61,000円に直した
-// （総務省の目安表の参考値 61,000円と一致する）。
 const CASES = [
   { income: 300, extra: {}, rate: 0.05, resident: 111500, cap: 28000 },
-  { income: 500, extra: {}, rate: 0.10, resident: 235500, cap: 61000 },
+  { income: 500, extra: {}, rate: 0.05, resident: 235500, cap: 57000 },
   { income: 700, extra: {}, rate: 0.20, resident: 369500, cap: 108000 },
   { income: 1000, extra: {}, rate: 0.20, resident: 609500, cap: 177000 },
   { income: 500, extra: { spouse: true }, rate: 0.05, resident: 202500, cap: 49000 },

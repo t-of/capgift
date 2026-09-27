@@ -28,9 +28,9 @@
 | `capgift.inputs` | `{ v: 1, year, income, spouse, hs, uni, social, donated, genre }`。`income`（年収、万円）・`social`（社会保険料、万円。`null` なら年収の15%で見積もり）・`donated`（今年もう寄付した額、円）。`year` が今の年と違えば `donated` だけ 0 に戻す |
 | `capgift.settings` | `{ v: 1, sound }` |
 
-### アフィリエイト ID の差し替え
+### アフィリエイト ID
 
-楽天アフィリエイトの ID は `calc.js` の `AFFILIATE_ID` 定数（1か所）に仮の値 `'TODO'` を入れてある。オーナーが楽天アフィリエイトの管理画面で ID を発行したら、ここを差し替える。
+楽天アフィリエイトの ID は `calc.js` の `AFFILIATE_ID` 定数（1か所）に、オーナーが楽天アフィリエイトの管理画面で発行した値を入れてある。
 
 ## アプリとして入れる（PWA）
 

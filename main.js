@@ -172,7 +172,7 @@ function renderBands(remainingYen) {
     a.className = 'bandbtn';
     a.href = window.Capgift.bandLink(inputs.genre, b.min, b.max);
     a.target = '_blank';
-    a.rel = 'sponsored noopener';
+    a.rel = 'nofollow sponsored noopener';
     const strong = document.createElement('strong');
     strong.textContent = b.label;
     const span = document.createElement('span');
