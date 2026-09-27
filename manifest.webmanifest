@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "CAPGIFT — ふるさと納税、あといくら",
+  "short_name": "CAPGIFT",
+  "description": "年収と家族を入れると、ふるさと納税で自己負担2,000円に収まる寄付の上限の目安を計算する。今年もう寄付した額を引いた残りの金額で、楽天ふるさと納税の返礼品をそのまま探せる。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b3d2e",
+  "theme_color": "#0b3d2e",
+  "lang": "ja",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

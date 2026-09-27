@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b3d2e">
+  <meta name="description" content="年収と家族を入れると、ふるさと納税の控除上限額の目安と、今年あといくら寄付できるかが分かる。残りの金額で楽天ふるさと納税の返礼品を探せる。">
+  <title>CAPGIFT — ふるさと納税の上限計算：あといくら寄付できる？</title>
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CAPGIFT">
+  <meta property="og:title" content="CAPGIFT — ふるさと納税の上限計算：あといくら寄付できる？">
+  <meta property="og:description" content="年収と家族を入れると、ふるさと納税の控除上限額の目安と、今年あといくら寄付できるかが分かる。残りの金額で楽天ふるさと納税の返礼品を探せる。">
+  <meta property="og:url" content="https://t-of.github.io/capgift/">
+  <meta property="og:image" content="https://t-of.github.io/capgift/icons/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- apple-mobile-web-app-status-bar-style は付けない（black-translucent だと iOS 26 で上部が隠れる） -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="CAPGIFT">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="./webapp-kit/webapp-kit.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="bar">
+      <div class="bar__names">
+        <h1 class="bar__title">CAPGIFT</h1>
+        <p class="bar__subtitle">ふるさと納税の上限計算</p>
+      </div>
+      <div class="bar__actions">
+        <button class="pill" id="soundBtn" type="button" aria-pressed="true">音 on</button>
+      </div>
+    </header>
+
+    <section class="stage" id="stage">
+      <p class="yearnotice" id="yearNotice" hidden>年が変わったので、寄付した額を0にしました。 <button type="button" id="yearNoticeClose">閉じる</button></p>
+      <ol class="howto">
+        <li>今年の年収（額面）と、家族を入れる。</li>
+        <li>上限の目安と、今年あといくら寄付できるかが出る。</li>
+        <li>「残りで選ぶ」から、その金額に合う返礼品を楽天ふるさと納税で見る。</li>
+      </ol>
+
+      <form class="inputs" id="inputs">
+        <div class="field">
+          <label for="income">今年の年収（給与の額面）</label>
+          <div class="field__row">
+            <button type="button" class="stepbtn" data-step="income" data-delta="-10" aria-label="10万円 減らす">−10</button>
+            <div class="numwrap">
+              <input type="number" id="income" inputmode="numeric" min="0" max="3000" step="1" placeholder="例 500">
+              <span class="unit">万円</span>
+            </div>
+            <button type="button" class="stepbtn" data-step="income" data-delta="10" aria-label="10万円 増やす">+10</button>
+          </div>
+          <p class="hint">源泉徴収票の「支払金額」。今年の見込みでよい。</p>
+        </div>
+
+        <div class="field">
+          <span class="field__label">配偶者</span>
+          <div class="choice2" id="spouseChoice" role="group">
+            <button type="button" class="choice2__btn is-active" data-spouse="false" aria-pressed="true">いない・共働き</button>
+            <button type="button" class="choice2__btn" data-spouse="true" aria-pressed="false">扶養している（配偶者控除）</button>
+          </div>
+          <p class="hint">「扶養している」は、年末調整で配偶者控除を受けている人。</p>
+        </div>
+
+        <div class="field field--row2">
+          <div class="stepper">
+            <span class="field__label">高校生の子（16〜18歳）</span>
+            <div class="stepper__row">
+              <button type="button" class="stepbtn" data-count="hs" data-delta="-1" aria-label="1人 減らす">−</button>
+              <span class="stepper__value" id="hsValue">0</span>
+              <button type="button" class="stepbtn" data-count="hs" data-delta="1" aria-label="1人 増やす">+</button>
+            </div>
+          </div>
+          <div class="stepper">
+            <span class="field__label">大学生の子（19〜22歳）</span>
+            <div class="stepper__row">
+              <button type="button" class="stepbtn" data-count="uni" data-delta="-1" aria-label="1人 減らす">−</button>
+              <span class="stepper__value" id="uniValue">0</span>
+              <button type="button" class="stepbtn" data-count="uni" data-delta="1" aria-label="1人 増やす">+</button>
+            </div>
+          </div>
+        </div>
+        <p class="hint">15歳以下の子は入れなくてよい（扶養控除がない）。</p>
+
+        <details class="field">
+          <summary>社会保険料 — <span id="socialSummary">年収の15%で見積もり中</span></summary>
+          <div class="field__row">
+            <div class="numwrap">
+              <input type="number" id="social" inputmode="numeric" min="0" placeholder="年収の15%で見積もり">
+              <span class="unit">万円</span>
+            </div>
+            <button type="button" class="pill" id="socialReset">15%に戻す</button>
+          </div>
+          <p class="hint">源泉徴収票の「社会保険料等の金額」を入れるとずれが減る。</p>
+        </details>
+
+        <div class="field">
+          <label for="donated">今年もう寄付した額</label>
+          <div class="numwrap">
+            <input type="number" id="donated" inputmode="numeric" min="0" placeholder="0">
+            <span class="unit">円</span>
+          </div>
+        </div>
+      </form>
+
+      <section class="result" id="result">
+        <p class="result__empty" id="resultEmpty">年収を入れると、ここに出ます。</p>
+        <div class="result__body" id="resultBody" hidden>
+          <p class="result__label">上限の目安</p>
+          <p class="result__cap"><span id="capValue">0</span> 円</p>
+          <p class="result__remain">今年あと <strong><span id="remainValue">0</span> 円</strong> 寄付できる目安</p>
+
+          <div class="gauge" id="gauge">
+            <div class="gauge__bar">
+              <div class="gauge__fill" id="gaugeFill"></div>
+            </div>
+          </div>
+          <p class="result__over" id="resultOver" hidden>上限の目安を超えています</p>
+          <p class="result__none" id="resultNone" hidden>この条件では、ふるさと納税の控除はほぼ受けられない目安です。</p>
+
+          <ul class="notices">
+            <li>目安です。住宅ローン控除・医療費控除・iDeCo・生命保険料控除などがある人、給与以外の収入がある人、年金の人は、実際の上限が変わります。</li>
+            <li>計算は総務省・国税庁が公表している式にもとづきます（2026年の寄付向け）。正確な額は、お住まいの市区町村・税務署・税理士にお確かめください。
+              出典: <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/furusato/mechanism/deduction.html" target="_blank" rel="noopener">総務省「税金の控除について」</a>・<a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1155.htm" target="_blank" rel="noopener">国税庁 No.1155</a></li>
+            <li>入れた数字はこの端末の中だけで計算し、どこにも送りません。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="pick" id="pick" hidden>
+        <p class="pr">PR</p>
+        <p class="pick__lead">楽天ふるさと納税の検索結果へ移ります。リンクから寄付があると、T.OF... に紹介料が入ることがあります。</p>
+        <div class="bandbtns" id="bandBtns"></div>
+        <div class="genres" id="genres">
+          <button type="button" class="genre is-active" data-genre="all" aria-pressed="true">すべて</button>
+          <button type="button" class="genre" data-genre="rice" aria-pressed="false">お米</button>
+          <button type="button" class="genre" data-genre="meat" aria-pressed="false">肉</button>
+          <button type="button" class="genre" data-genre="seafood" aria-pressed="false">魚介</button>
+          <button type="button" class="genre" data-genre="fruit" aria-pressed="false">果物</button>
+          <button type="button" class="genre" data-genre="daily" aria-pressed="false">日用品</button>
+        </div>
+      </section>
+
+      <details class="explain">
+        <summary>計算のしかたと出典</summary>
+        <div class="explain__body">
+          <p>自己負担2,000円で済む上限は、次の式で決まります（総務省の説明から）。</p>
+          <pre>上限の目安 = 住民税所得割額 × 20% ÷ (90% − 所得税率 × 1.021) + 2,000円</pre>
+          <ol>
+            <li>給与所得 = 年収 − 給与所得控除（年収に応じた表）。</li>
+            <li>社会保険料 = 年収 × 15%（または入れた額）。</li>
+            <li>所得税の課税所得 = 給与所得 − 社会保険料 − 基礎控除 − 配偶者控除・扶養控除。</li>
+            <li>住民税の課税所得 = 給与所得 − 社会保険料 − 基礎控除（43万円）− 配偶者控除・扶養控除（住民税の額）。</li>
+            <li>調整控除を引いて、住民税所得割額を出す。</li>
+            <li>上の式で上限の目安を出し、今年もう寄付した額を引いて残りを出す。</li>
+          </ol>
+          <p>出典: <a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/furusato/mechanism/deduction.html" target="_blank" rel="noopener">総務省「ふるさと納税のしくみ｜税金の控除について」</a>・<a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1155.htm" target="_blank" rel="noopener">国税庁 No.1155 ふるさと納税（寄附金控除）</a>・<a href="https://www.nta.go.jp/users/gensen/2026kiso/index.htm" target="_blank" rel="noopener">国税庁 令和8年度税制改正による所得税の基礎控除の引上げ等について</a></p>
+        </div>
+      </details>
+    </section>
+
+    <footer class="credit">
+      <p><a href="/">T.OF...</a> のアプリ・<a href="https://t-of.github.io/contact/" target="_blank" rel="noopener">問い合わせ</a>・<a href="./privacy.html">プライバシーポリシー</a></p>
+      <div class="credit__actions">
+        <button class="pill" data-wak="install" hidden>アプリにする</button>
+        <button class="pill" data-wak="share">共有</button>
+      </div>
+    </footer>
+  </main>
+
+  <script src="./calc.js"></script>
+  <script src="./webapp-kit/webapp-kit.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>
